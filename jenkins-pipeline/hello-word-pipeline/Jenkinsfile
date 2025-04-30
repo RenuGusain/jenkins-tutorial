@@ -1,0 +1,41 @@
+pipeline {
+    agent any
+    environment
+    {
+        BUILD_FILE_NAME='laptop.txt'
+    }
+
+    stages {
+        stage('Hello') {
+            steps {
+                  cleanWs()
+                sh '''
+                mkdir -p build
+                touch build/$BUILD_FILE_NAME
+                echo "mainboard">>build/$BUILD_FILE_NAME
+                cat build/$BUILD_FILE_NAME
+                '''
+            }
+        }
+        stage("Test")
+        {
+            steps
+            {
+                sh '''
+                echo "hello this is test"
+                test -f  build/$BUILD_FILE_NAME
+                grep mainboard build/$BUILD_FILE_NAME
+                '''
+            }
+        }
+    }
+    
+    post
+    {
+        success
+        {
+            archiveArtifacts artifacts: 'build/**'
+        }
+        
+    }
+}
